@@ -14,13 +14,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
-  if (!req.file) return res.json({ error: 'no file uploaded' });
+app.post('/api/fileanalyse', (req, res, next) => {
+  upload.single('upfile')(req, res, (err) => {
+    if (err) return res.json({ error: err.message });
+    if (!req.file) return res.json({ error: 'no file uploaded' });
 
-  res.json({
-    name: req.file.originalname,
-    type: req.file.mimetype,
-    size: req.file.size
+    res.json({
+      name: req.file.originalname,
+      type: req.file.mimetype,
+      size: req.file.size
+    });
   });
 });
 
