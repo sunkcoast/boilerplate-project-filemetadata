@@ -8,6 +8,11 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors({ optionsSuccessStatus: 200 }));
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+});
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
