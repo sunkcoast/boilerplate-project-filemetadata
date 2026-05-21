@@ -7,7 +7,7 @@ const multer = require('multer');
 const app = express();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // max 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }
 });
 
 app.use(cors({ optionsSuccessStatus: 200 }));
@@ -23,10 +23,11 @@ app.get('/', (req, res) => {
 
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
   if (!req.file) return res.json({ error: 'no file uploaded' });
+  res.setHeader('Content-Type', 'application/json');
   res.json({
     name: req.file.originalname,
     type: req.file.mimetype,
-    size: req.file.size
+    size: Number(req.file.size)
   });
 });
 
