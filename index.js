@@ -5,12 +5,14 @@ const cors = require('cors');
 const multer = require('multer');
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // max 10MB
+});
 
 app.use(cors({ optionsSuccessStatus: 200 }));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
   next();
 });
 app.use(express.static('public'));
@@ -19,16 +21,12 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/api/fileanalyse', (req, res, next) => {
-  upload.single('upfile')(req, res, (err) => {
-    if (err) return res.json({ error: err.message });
-    if (!req.file) return res.json({ error: 'no file uploaded' });
-
-    res.json({
-      name: req.file.originalname,
-      type: req.file.mimetype,
-      size: req.file.size
-    });
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  if (!req.file) return res.json({ error: 'no file uploaded' });
+  res.json({
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size
   });
 });
 
